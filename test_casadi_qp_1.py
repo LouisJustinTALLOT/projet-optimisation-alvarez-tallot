@@ -1,5 +1,5 @@
 import casadi
-
+import numpy as np
 # nos données
 L = 10
 N = 60
@@ -26,5 +26,17 @@ f += K * (z[-1] - L/2)**2
 # on veut minimiser
 opti.minimize(f)
 # on rajoute les contraintes
-opti.subject_to(z[0] = 0)
+opti.subject_to(z[0] == 0) # y_0
+opti.subject_to(z[N] == 0) # y_N
+opti.subject_to(z[N+1] == 0) # x_0
 
+for i in range(N):
+    # on rajoute les contraintes inégalités
+    pass
+
+
+
+# on résoud
+opti.solver('ipopt')
+sol = opti.solve()
+print(sol.value(z))
