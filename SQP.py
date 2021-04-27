@@ -10,6 +10,37 @@ N = 60
 g = 3
 dx_carre = L/N
 
+def conditions_initiales(L=10, N=60):
+    dx = L/N   
+    # Condition initiale - triangle rectangle isocèle
+    # les y d'abord
+    y = []
+    res = 0
+    while res <= L/(2*np.sqrt(2)):
+        y.append(res)
+        res += dx / (np.sqrt(2))
+
+    res = L/(2*np.sqrt(2)) - dx/(2*np.sqrt(2))
+    while res >= 0:
+        y.append(res)
+        res -= dx/np.sqrt(2)
+
+    if len(y)<N+1:
+        y.append(res)
+    x = []
+    res = 0
+
+    while res <= L/(np.sqrt(2)):
+        x.append(res)
+        res += dx/np.sqrt(2)
+
+    if not np.isclose(x[-1], L/(np.sqrt(2))):
+        x.append(L/(np.sqrt(2)))
+
+    z0_triangle_haut = np.array(y+x)
+    z0_triangle_bas = np.array(list(-1.*np.array(y))+x)
+
+    return z0_triangle_haut, z0_triangle_bas
 
 
 G = np.zeros((2*(N+1),2*(N+1)))
@@ -60,8 +91,11 @@ def c_ineq_final(z):
 cons = [{'type':'eq', 'fun':c_eq}, {'type':'ineq', 'fun':c_ineq}]
 cons2 = [{'type':'eq', 'fun':c_eq}]
 cons3 = [{'type':'ineq', 'fun':c_ineq_final}]
-result = optimize.minimize(f, np.zeros((2*(N+1))), method='SLSQP', constraints = cons3).x
+result = optimize.minimize(f, conditions_initiales()[0], method='SLSQP', constraints = cons3).x
 #print(result)
+
+
+
 
 X = [result[i] for i in range(N+1, 2*N+2)]
 Y = [result[i] for i in range(0, N+1)]
